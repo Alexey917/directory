@@ -1,0 +1,35 @@
+-создаем в папке приложения файл forms.python
+в нем:
+from django import forms
+ 
+class UserForm(forms.Form):
+    name = forms.CharField()
+    age = forms.IntegerField()
+
+-в html создаем тег формы и в него помещаем:
+{% csrf_token %}
+    <table>
+        {{ form }}
+    </table>
+-вместо табле может быть div,ul,p и соответсвенно
+{{ form.as_div }}, {{ form.as_ul }} и.т.д
+
+во views:
+from .forms import UserForm
+ 
+def index(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        age = request.POST.get("age")
+        return HttpResponse(f"<h2>Привет, {name}, твой возраст: {age}</h2>")
+    else:
+        userform = UserForm()
+        return render(request, "index.html", {"form": userform})
+
+валидация:
+ if user_form.is_valid():
+            login = user_form.cleaned_data["login"]
+            password = user_form.cleaned_data["password"]
+
+проверку наличия данных в бд как раз можно сделать используя is_valid(),
+но проверку корректности ввода наверное лучше задавать через js

@@ -1,0 +1,122 @@
+Установка реакт приложения:
+  -npm install -g create-react-app
+  -затем, там где хотите создать проект(напримет на рабочем столе) пишем npx create-react-app 'название'
+  -запускаем проект командой npm start
+  -npm i - установка node_modules
+  -npm run dev  - сайт доступен по локальному порту 5173
+
+Компонент - это элемент на странице(шапка, футер, карточка), а также функция, внутри которой в return находится html код, а в {} указывается динамические данные
+
+в папке source создать папку components - там лежат jsx компоненты
+
+Если хотим вставить картинку, то можем импортировать ее ка js файл:
+  import logo from 'путь к картинке'
+  там в верстке применим <img src="{logo}">
+
+В тег-компонент можно передать атрибуты из какого нибудь, объекта или списка, а в параметрах фукции написать props
+ИЛИ использовать деструктуризацию {title discription}, т.е сами атрибцты вписать
+
+Еще элементы списка можно вставить вот так:
+  <WayToTeach {...ways[1]}>
+
+
+className - аналог атрибута class для html тегов в реакте
+
+папка под компонент например назовем botton, в нее поместим
+все файлы связанные с этой кнопкой(Button.jsx, Button.css)
+
+
+props- параметры функции. childreen - специалный props, который вставляется между тегами компонентами, например
+<Button>Доход</Button>
+
+архитектура приложения - способ построения структуры вашего приложения
+
+
+События в реакте:
+атрибут onClick = {handlerClick}
+
+function handlerClick() {
+  console.log('click')
+}
+
+onDoubleClick = {() => console.log('click')}
+
+События можно передавать в качестве параметров функции-компонента
+
+а потом <Button onClick={handlerClick}>
+
+() => handlerClick('way') 
+way - это type
+
+state - состояние приложения
+
+import {useState} from 'react' - это хук
+
+в App():
+const [contentType, setContentType] = useState() - начальное состояние элемента
+
+- нельзя хуки писать вне компонента
+- и вкладывать в блоки типо if итд тоже нельзя
+
+const content = contentType
+const setContent = setContentType
+при клике на кнопку:
+ setContent(type)
+
+ Пока заново рендер не произойдет, состояние не изменится
+
+ Фиксирование ежесекундного времени:
+  const [now, setNow] = useState(new Date())
+  setInterval(() => setNow(new Date()), 1000)
+
+
+  в качестве применения услоий можно использвать обычные if или тернарные операторы
+
+  чаще буду встречаться такие конструкции на условия:
+  {!contentType && <p></p>}
+  {contentType && <p></p>}
+
+это итерируемый вывод массива:
+{ways.map((way) => <WayToTeach key={way.title} {...way}/>)}
+
+fragment - вместо div внутри div с id root
+<>
+</>
+
+инлайн стили - в теге атрибут style={{color: red}}
+
+как выглядит jsx:
+  import React from 'react'
+
+  export default function IntroSection() {
+    return React.createElement('section', null, 
+    [
+      React.createElement('h1', {className: 'centered' key: 1}, 'Result University')
+      React.createElement('h1', {className: 'centered' key: 1}, 'Result University')
+      ])
+  }
+
+  Если дети на одном уровне, то они представляются как элементы массива
+  React.createElement принимает три параметра 1: название тега, 2: какие опции в теги мы передаем, 3: вложенные элементы
+
+  Вариант отображения контента через условие с использованием фрагмента
+  {tab === 'main' && (
+    <>
+      <TeachSection />
+      <Differences />
+    </>
+  )}
+
+  import classes from ./Header.modulesw.css
+  в классе можно использовать classes.button или classes.active
+
+  styled-component - бибиотека
+
+  npm i styled-components
+
+  import {styled} from styled-components
+  const HeaderContainer = styled.header`
+    color: red;
+    font-style: italic
+  `
+

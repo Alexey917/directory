@@ -1,0 +1,221 @@
+1) Установка имени и эл. почты:
+git config --global user.name "Your name"
+git config --global user.email "Your email"
+
+2) Параметры установки окончания строк:
+git config --global core.autocrlf true
+git config --global core.safecrlf warn
+
+3) Установка отображения unicode:
+git config --global core.quotepath off
+
+4) создать новую папку:
+mkdir
+
+5) создать файл: 
+touch hello.html - только в git bash
+
+6) Создать репозиторий из текущей папки:
+git init
+
+7) Проиндексировать изменения:
+git add hello.html
+git add . - добавить все изменения в файл
+
+8) Зафиксировать изменения:
+git commit -m "Текст какой-то"
+
+9) Проверить состояние репозитория:
+git status
+
+10) Если есть изменения в файле: 
+git add hello.html - (они будут не на всегда)
+git reset - снимет индексацию
+
+11) Три разный файла:
+git add a.html
+git add b.html
+git commit -m "Текст"
+git add c.html
+git commit -m "Текст"
+разделяем коммитами индексацию
+
+12) Можно коммитить через редактор кода для этого используется
+команда git commit без всего. В commit_editmsg в первой строке пишем
+название коммита и закрываем файл
+
+13) История коммитов:
+git log
+
+14) Однострочный вариант отображения:
+git log --pretty=oneline
+
+15) Удобное отображение истории:
+git log --pretty=format: "%h %ad | %s%d [%an]" --graph --date=short
+
+16) Алиасы и шорткаты:
+git config --global alias.co checkout
+git config --global alias.ci commit
+git config --global alias.st status
+git config --global alias.br branch
+git config --global alias.hist "log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short"
+git config --global alias.type 'cat-file -t'
+git config --global alias.dump 'cat-file -p'
+
+alias gs='git status '
+alias ga='git add '
+alias gb='git branch '
+alias gc='git commit'
+alias gd='git diff'
+alias gco='git checkout '
+alias gk='gitk --all&'
+alias gx='gitx --all'
+
+alias got='git '
+alias get='git '
+
+17) перемещает в версию по хешу:
+git checkout <хеш>
+
+18) вернуться к последней версии ветки мастер:
+git checkout master
+
+19) дать название текущей ветке:
+git tag name
+
+20) переход на предыдущую версию с помощью тега:
+git checkout name^1
+
+21) выведет содержимое файла:
+cat имя файла
+
+22) покажет какие теги доступны: 
+git tag
+
+23) покажет всю историю, даже если откатимся: 
+git hist master --all
+
+24) откатит изменения(до индексации):
+git checkout <последняя версия, файл>
+
+25) сбросит проиндексированные изменения(очищает буферную зону), но 
+содержимое файла не откатит, нужен будет checkout <последняя версия>:
+git reset HEAD hello.html
+
+26) отменяет коммит  самый последний. Созданием коммита удаляем предыдущие изменения:
+git revert HEAD
+
+27) удалить коммит по хешу:
+git revert <hash>
+
+28) сбрасывает ветку до тега или хеша:
+git reset --hard v1
+--hard указывает, что каталог должен быть обновлен в соответствии с новым head ветки
+Ветка останется в репозитории(найти через git hist --all) и 
+обратиться можно через тег или хеш
+
+29) удалить тег из репозитория:
+git tag -d название тега
+
+30) изменить предыдущий коммит:
+git commit --amend -m "название"
+
+31) перемещает файл в место которое укажем:
+git mv файл место куда переместить
+Файл сначало удаляется, потом создается в другом(указанном месте)
+
+32) каталог, в котором хранятся все материалы git(юзать в корневой папке):
+ls -C .git
+
+33) вывод списка содержимого текущего каталога:
+ls
+
+34) выведет последнюю запись в истории коммитов:
+git hist --max-count=1
+
+35) вывод объекта коммита, который находится во главе ветки:
+git cat -file -t <hash>
+git cat -file -p <hash>
+.git порядок поиска содержимого коммита:
+деревья
+блобы
+коммиты
+
+36) переход на другую ветку:
+git checkout branch <имя ветки>
+
+37) слияние двух веток:
+git merge <ветка>
+решение конфликта:
+исправил файл -> добавил -> коммит
+
+38) перенос из одной ветки в другую(перебазирование):
+git rebase <ветка>
+rebase предпочтительнее использовать для кратковременных, локальный веток, а слияние для веток в публичном репозитории
+
+39) показывает мое текущее местоположение:
+pwd
+
+40) клонировать репозиторий:
+git clone hello cloned_hello
+
+41) узнать имя удаленного репозитория:
+git remote
+git remote show origin - более подробная информация
+
+42) .gitignore - в нем перечисляется список папок и файлов, которые не должны попасть в git
+/logs - так указывается папка, которую нужно запретить
+
+43) выводит список локальных веток:
+git branch
+
+44) все ветки(из удаленного репозитория в github тоже):
+git branch -a 
+
+45) будет извлекать новые коммиты из удаленного репозитория, но не будет сливать их с вашими наработками в локальных ветках:
+git fetch
+
+46) позволить слить изменения локальные с удаленными:
+git merge origin/master
+
+47) заливает измененния на удаленный репозиторий. Эта команда эквивалентна двух предыдущим:
+git pull
+
+48) копия репозитория для совместного использование репозитория:
+git clone git://localhost/hello.git network_hello
+
+49) справка по командам:
+git --help
+
+50) создает новую ветку:
+git checkout -b название
+
+51) сливает ветки на локальном репозитории:
+git pull
+
+52) позволяет отслеживать ветку в удаленном репозитории:
+git branch --track style origin/style
+
+53) создание чистого репозитория(без папки .git):
+git clone --bare hello hello.git
+
+54) добавление репозитория к оригинальному:
+girt remote add shared ../hello.git
+
+55) удалить ветку: 
+git branch --delete название
+
+56) клонировать репозиторий на свой компьютер:
+git clone <ssh key>
+
+57) залить изменения на github:
+git push
+
+58) отправка изменений в общий репозиторий:
+git push shared master
+
+59) запуск git сервера: 
+git daemon --verbose --export-all --base-path=.
+
+60) красивый лог коммитов:
+git config --global alias.hist "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"

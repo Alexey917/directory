@@ -1,0 +1,13 @@
+1. package.json в нем прописать:
+
+"scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+
+2. Создать папку src, в ней папку modules и js файл
+3. в модулях будут храниться все скрипты и их функции должны не вызываться как обычно, 
+а вот так: export default name_function;
+4. В js файле: import name_function
+5. В терминале прописать команду: npm run build
+6. После чего появится сжатый js файл в папке dist	

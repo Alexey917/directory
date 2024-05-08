@@ -1,0 +1,65 @@
+1. В settings установить базу данных в словаре DATABESES
+2. Создать модель в нашем приложении(класс с полями)
+3. Если используем sqlite studio то в нем подключаем бд из джанго
+4. выполняем команду python manage.py makemigrations
+5. добавляем нашу таблицу в бд командой python manage.py migrate
+
+- Чтобы работать с таблицей используем CRUD:
+create()
+read()
+update()
+delete()
+
+переходим в командную строку python manage.py shell
+в ней поключаем модуль с моделью from 'название приложения'.models import 'название класса'
+
+создать запись:
+w1 = Women(title='Имя', content='контент')
+затем добаляем запись в таблицу командой w1.save()
+
+w2 = Women()
+w2.title = 'Имя'
+w2.content = 'Контент'
+w2.save()
+
+
+Women.objects.create(title='Имя', content='контент') - запись появится сразу save не нужен
+
+Women.objects.all() - выводит список записей
+Если мы хотим каждую запись индетифицировать по параметру title, то в классе модели пропишем
+def __str__(self):
+  return self.title
+
+чтобы изменения пришли в силу сделаем команду exit()
+и поновой входим через manage.py shell lдалее импорт итд
+
+Women.objects.filter(title='Имя') - выберет конкретные записи с title='Имя' (в sql аналог where)
+
+посмотреть все sql запросы:
+from django.db import connection
+connection.queries
+
+Women.objects.get(pk=2) - получить конкретную запись. Тут мы знаем что она должна быть одна единственная (pk - это id). Также возвращает значение(не список)
+
+Women.objects.get(pk__gte=2) - сгенерирует ошибку если записей больше чем одно
+Women.objects.filter(pk__gte=2) - фильтр выдаст список записей или пустой список
+pk__gte=2 => pk > 2
+pk__lte=2 => pk < 2
+
+
+Women.objects.get(pk__gte=2).order_by('title') - выведет все записи где id больше 2 их отсортирует их по полю title в алфавитном порядке
+
+Women.objects.order_by('-time_update') -отсортирует записи в обратном порядке (аналог DISC)
+
+Для удаления: 
+выбираем записи например wd = Women.objects.filter(pk__gte=2) - заносим в переменную wd, затем wd.delete()
+
+Для обновления:
+выбираем записи например wu = Women.objects.get(pk__gte=2) - заносим в переменную и меняем значение полей wu.title='Имя2', затем wu.save()
+
+
+ForeignKey - для связей Many to One (поля отношений)
+ForeignKey(Ссылка на первичную модель, on_delete=ограничения при удалении)
+
+ManyToManyField - для связий Many to Many (многие ко многим)
+OneToOneField - для связей One to One (один к одному)

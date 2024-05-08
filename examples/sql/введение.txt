@@ -1,0 +1,174 @@
+пароль от mysql workbrench: e38-d2UB!4h
+отношения - связи между таблицами
+реляционные бд - это бд, которые позволяют установить связи между таблицами
+
+команда для sql через cmd:
+  mysql -u root -p - подключение к mysql workbrench
+  вводим пароль и мы внутри
+  show databases; - показать все бд
+  create database 'имя'; - создание бд
+  drop database 'имя'; - удалить бд с именем...
+  create database 'имя' character set utf8 collate utf8_general_ci; - создать бд с кодировкой utf-8
+  use '' - выбираем бд в котором создаем таблицу
+  create table '' (id int(11) not null, name varchar(50), age int(11) not null,     primary key(id)); - создание таблицы с колонками
+  show tables from ''; - показать все таблицы
+  show columns from '' from ''; - показать колонки таблицы
+  show create table ''; - структура таблицы
+  drop table ''; - удалить таблицу целиком
+
+соединение с сервером:
+  делаем новую модель -> экспртируем как скрипт -> затем через + на главной добавляем новое соединение -> связь бд с сервером готова -> заходим туда -> загружаем наш скрипт(open sql script) -> на молнию нажимаем
+
+переименование бд:
+  -создать новую 
+  -переименовать таблицы в старой бд на новую
+  RENAME TABLE
+    old.table1 TO new.table1;
+  -удалить старую бд
+
+SQL запросы:
+  CREATE - используется для создания любых сущностей: таблиц, индексов, последовательностей
+
+  CREATE TABLE 'имя таблицы' (
+    id BIGINT PRIMARY KEY NOT NULL,
+    first_name VARCHAR(64) NOT NULL,
+    last_name VARCHAR(64) NOT NULL,
+    email VARCHAR(128) NOT NULL
+  );
+
+  INSERT - позволяет вставить любые данные в любую таблицу в виде новой строки в ней
+  INSERT INTO 'имя таблицы' (id, first_name, email) - колонки в котор. вставляем
+  VALUES (1, 'Vlad', 'vladmail@yandex.ru'); - значение котор. вставляем
+
+  UPDATE - используется для обновления определенных значений определенных колонок в конкретных строках таблицы
+  UPDATE 'имя таблицы' SET
+  email = 'новое значение' , first_name = 'новое значение'
+  условие для каких строк:
+  WHERE id = 1
+
+  DELETE - выполняет удаление строк из данной таблицы, выбранных по какому-либо определенному условию
+  DELETE FROM 'имя таблицы'
+  WHERE id = 2 OR id = 3
+
+  SELECT - определяет конкретные строки и колонки в данной таблице, которые необходимо выбрать(прочитать) из бд
+  SELECT id, first_name, last_name FROM  'имя таблицы'
+  WHERE id = 1
+  Если нужны все колонки использвуем знак *
+
+  foriegn key - внешний ключ - значение по которому данная строка относится к другой строке из другой таблицы
+
+  CONSTRAINT - определяет новое правило организации данных в бд(связи, итд)
+  CONSTRAINT user_id_FK FOREIGN KEY (user_id) REFERENCES 'имя таблицы' (id)
+
+  DISTINCT - позволяет выбрать только уникальные строки из таблицы. Например, чтобы вывести все уникальные значения из колонки «имя» таблицы «пользователи», можно использовать следующий запрос:
+
+  SELECT DISTINCT имя FROM пользователи;
+
+Первичный ключ - это параметр, который устанавливается для однозначной идентификации той или иной записи в таблице. Значения SQL PRIMARY KEY должны быть всегда уникальны, а так же не содержать значений NULL 
+
+CREATE TABLE 'Овощи и фрукты' (
+id BIGINT PRIMARY KEY NOT NULL,
+название CHAR(70) NOT NULL,
+тип CHAR(5) NOT NULL,
+цвет CHAR(25) NOT NULL,
+калорийность INT NOT NULL,
+краткое описание VARCHAR(2000) NOT NULL
+);
+
+
+поля - колонки или столбцы
+записи - строки
+
+
+CREATE TABLE имя_таблицы (перечисление полей и их типов, ограничений) – служитдля создания новой таблицы в текущей БД;
+DROP TABLE имя_таблицы – служит для удаления таблицы из текущей БД;
+ALTER TABLE имя_таблицы ALTER COLUMN имя_столбца … – служит для обновления типастолбца или для изменения его настроек (например для задания характеристикиNULLили NOT NULL);
+ALTER TABLE имя_таблицы ADD CONSTRAINT имя_ограничения PRIMARY KEY(поле1, поле2…) – добавление первичного ключа к уже существующей таблице;
+ALTER TABLE имя_таблицы DROP CONSTRAINT имя_ограничения – удаление ограничения изтаблицы.
+
+
+Добавление свойства IDENTITY к полю – позволяет сделать это поле автоматически заполняемым (полем-счетчиком) для таблицы;
+ALTER TABLE имя_таблицы ADD перечень_полей_с_характеристиками – позволяет добавить новые поля в таблицу;
+ALTER TABLE имя_таблицы DROP COLUMN перечень_полей – позволяет удалить поля из таблицы;
+ALTER TABLE имя_таблицы ADD CONSTRAINT имя_ограничения FOREIGN KEY(поля) REFERENCES таблица_справочник(поля) – позволяет определить связь между таблицей и таблицей справочником.
+
+Полностью очистим таблицу Employees при помощи команды TRUNCATE TABLE
+
+Напоследок стоит сказать, что ссылочные ключи могут включать дополнительные опции ON DELETE CASCADE и ON UPDATE CASCADE, которые говорят о том, как вести себя при удалении или обновлении записи, на которую есть ссылки в таблице-справочнике. Если эти опции не указаны, то мы не можем изменить ID в таблице справочнике у той записи, на которую есть ссылки из другой таблицы, так же мы не сможем удалить такую запись из справочника, пока не удалим все строки, ссылающиеся на эту запись или, же обновим в этих строках ссылки на другое значение.
+
+DROP TABLE Employees
+
+CREATE TABLE Employees(
+  ID int NOT NULL,
+  Name nvarchar(30),
+  Birthday date,
+  Email nvarchar(30),
+  PositionID int,
+  DepartmentID int,
+  ManagerID int,
+CONSTRAINT PK_Employees PRIMARY KEY (ID),
+CONSTRAINT FK_Employees_DepartmentID FOREIGN KEY(DepartmentID) REFERENCES Departments(ID)
+ON DELETE CASCADE,
+CONSTRAINT FK_Employees_PositionID FOREIGN KEY(PositionID) REFERENCES Positions(ID),
+CONSTRAINT FK_Employees_ManagerID FOREIGN KEY (ManagerID) REFERENCES Employees(ID)
+)
+
+INSERT Employees (ID,Name,Birthday,PositionID,DepartmentID,ManagerID)VALUES
+(1000,N'Иванов И.И.','19550219',2,1,NULL),
+(1001,N'Петров П.П.','19831203',3,3,1003),
+(1002,N'Сидоров С.С.','19760607',1,2,1000),
+(1003,N'Андреев А.А.','19820417',4,3,1000)
+
+-- даем разрешение на добавление/изменение IDENTITY значения
+SET IDENTITY_INSERT Departments ON
+
+INSERT Departments(ID,Name) VALUES(3,N'ИТ')
+
+-- запрещаем добавление/изменение IDENTITY значения
+SET IDENTITY_INSERT Departments OFF
+
+
+PRIMARY KEY – первичный ключ;
+FOREIGN KEY – настройка связей и контроль ссылочной целостности данных;
+UNIQUE – позволяет создать уникальность;
+CHECK – позволяет осуществлять корректность введенных данных;
+DEFAULT – позволяет задать значение по умолчанию;
+Так же стоит отметить, что все ограничения можно удалить, используя команд
+«ALTER TABLE имя_таблицы DROP CONSTRAINT имя_ограничения».
+
+ALTER TABLE Employees ADD CONSTRAINT CK_Employees_ID CHECK(ID BETWEEN 1000 AND 1999)
+
+ALTER TABLE Employees ADD DEFAULT SYSDATETIME() FOR HireDate
+
+ALTER TABLE имя_таблицы ADD CONSTRAINT имя_ограничения UNIQUE(поле1,поле2,…)
+
+CLUSTERED – означает, что записи таблицы будут сортироваться по этому индексу, так же можно сказать, что этот индекс имеет непосредственный доступ ко всем данным таблицы. Это так сказать главный индекс таблицы.  Если мы хотим сказать, чтобы кластерный индекс использовался не в первичном ключе, а для другого индекса, то при создании первичного ключа мы должны указать опцию NONCLUSTERED:
+  ALTER TABLE имя_таблицы ADD CONSTRAINT имя_ограничения
+  PRIMARY KEY NONCLUSTERED(поле1,поле2,…)
+
+Индексы по полю или полям можно создавать следующей командой:
+
+CREATE INDEX IDX_Employees_Name ON Employees(Name)
+
+Так же здесь можно указать опции CLUSTERED, NONCLUSTERED, UNIQUE, а так же можно указать направление сортировки каждого отдельного поля ASC (по умолчанию) или DESC:
+
+CREATE UNIQUE NONCLUSTERED INDEX UQ_Employees_EmailDesc ON Employees(Email DESC)
+
+
+Удалить индекс можно следующей командой:
+
+DROP INDEX IDX_Employees_Name ON Employees
+
+
+CREATE TABLE Positions(
+  ID int IDENTITY(1,1) NOT NULL CONSTRAINT PK_Positions PRIMARY KEY,
+  Name nvarchar(30) NOT NULL
+)
+
+CREATE TABLE Departments(
+  ID int IDENTITY(1,1) NOT NULL CONSTRAINT PK_Departments PRIMARY KEY,
+  Name nvarchar(30) NOT NULL
+)
+
+
+Заметим, что здесь мы использовали новую опцию IDENTITY, которая говорит о том, что данные в столбце ID будут нумероваться автоматически, начиная с 1, с шагом 1, т.е. при добавлении новых записей им последовательно будут присваиваться значения 1, 2, 3, и т.д. Такие поля обычно называют автоинкрементными. В таблице может быть определено только одно поле со свойством IDENTITY и обычно, но необязательно, такое поле является первичным ключом для данной таблицы.

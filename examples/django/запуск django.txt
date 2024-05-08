@@ -1,0 +1,89 @@
+-pip intall django
+-django-admin startproject 'название' - (название лучше чтобы совпадало с именем домена)
+-переходим в наш созданный проект командой cd
+-python manage.py runserver
+-python manage.py startapp hello - создание приложения
+-в settigs INSTALLED_APPS добавить название приложения в ковычках
+cправой кнопкой мыши создаем в нашем hello urls.py
+
+в нем :
+from django.contrib import admin
+from . import views
+from django.urls import path, include
+
+urlpatterns = [
+    path('', views.index)
+]
+
+в urls djangoo:
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('hello.urls'))
+]
+
+во views.py:
+def index(request):
+    return render(request, 'index.html')
+затем в hello создать templates,в ней hello в ней hello\index.html
+
+создаем папку static в hello, внутри static создаем hello, а внутри папки 
+css и js
+
+в settings указываем:
+STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = []
+
+в шаблонах самой первой строкой после doctype указываем 
+{% load static %} - для подключения статических файлов
+
+в теге link атрибуте  href={% static 'путь к css файлу' %}
+
+
+в ссылках(тегах <а></a>) путь нужно прописывать так:
+href={% url 'имя странички(задается параметром name в имя_приложение/urls.py)' доп.параметры  %}
+
+
+в модели для доп.параметров:
+def get_absolute_url(self):
+    return reverse('post', kwargs={'post_id': self.pk}) - это если нам нужно перейти по ссылке на статью, например, о которой есть инфа в определенной записе бд таблицы
+далее в html где ссылка - href="{{ obj.get_absolute_url }}"
+
+path('post/<int: post_id>/' index.html, name='post')
+
+
+python manage.py createsuperuser - создание админа для сайта
+в admin.py регистрируем приложение:
+
+from .models import *
+admin.site.register(Women)
+
+
+для редактирования пмодели в админ панели существует класс Meta:
+
+class Meta:
+    verbose_name = "Название которое хотим"
+    verbose_name_plural = "Название которое хотим" # для редактирования записи во множественном числе
+    ordering = ['-time_create', 'title'] # сортировка записей(знак минус - сортировка по убыванию)
+
+класс Meta - вложен в класс модели
+
+Если хотим видить дополнительно поля каждой записи в админке
+в admin.py:
+class WomenAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'time_create', 'photo', 'is_published')
+    list_display_links = ('id', 'title')
+    search_fields = ('title', 'content')
+    list_editable = ('is_published',) # позволит прям в админке редактировать значение чекбокса
+    list_filter = ('is_published', 'time_create')
+
+admin.site.register(Women, WomenAdmin)
+
+в модели в параметрах поля можно прописать verbose_name='Название', чтобы названия полей отображались в удобном для вас виде
+
+
+отображение фото:
+в теге img атрибут src= "{{p.photo.url}}"
