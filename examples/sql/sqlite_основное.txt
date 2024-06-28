@@ -1,0 +1,113 @@
+Основные темы SQLite:
+
+    Создание и изменение таблиц:
+        Создание таблицы с указанием столбцов и их типов данных.
+        Изменение структуры таблицы (добавление столбцов, переименование таблицы).
+
+    Пример ответа:
+
+    sql
+
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY,
+    name TEXT,
+    salary INTEGER,
+    hire_date DATE,
+    departments_id INTEGER,
+    position TEXT
+);
+ALTER TABLE employees RENAME TO staff;
+
+Основные операторы SELECT:
+
+    Выборка данных из таблицы с использованием различных условий (WHERE).
+    Сортировка данных (ORDER BY).
+    Ограничение количества выводимых строк (LIMIT).
+
+Пример ответа:
+
+sql
+
+SELECT name, salary
+FROM employees
+WHERE salary > 50000
+ORDER BY name;
+
+Агрегатные функции:
+
+    Вычисление среднего значения (AVG).
+    Подсчет количества строк (COUNT).
+
+Пример ответа:
+
+sql
+
+SELECT AVG(salary) AS avg_salary
+FROM employees;
+
+Группировка данных:
+
+    Группировка по значениям столбца (GROUP BY).
+    Использование агрегатных функций вместе с GROUP BY.
+
+Пример ответа:
+
+sql
+
+SELECT position, COUNT(*) AS count_empl
+FROM employees
+GROUP BY position;
+
+Соединение таблиц (JOIN):
+
+    Внутреннее соединение (INNER JOIN).
+    Левое соединение (LEFT JOIN).
+
+Пример ответа:
+
+sql
+
+SELECT employees.name, departments.name AS department
+FROM employees
+JOIN departments ON employees.departments_id = departments.id;
+
+Использование подзапросов и оконных функций:
+
+    Использование подзапросов для вычисления значений.
+    Использование оконных функций для анализа данных в пределах групп.
+
+Пример ответа:
+
+sql
+
+SELECT name, salary, departments_id
+FROM (
+    SELECT name, salary, departments_id, ROW_NUMBER() OVER (PARTITION BY departments_id ORDER BY salary DESC) as rn
+    FROM employees
+) subquery
+WHERE rn = 1;
+
+Использование транзакций и триггеров:
+
+    Создание транзакций для выполнения нескольких операций атомарно.
+    Создание триггеров для автоматического выполнения операций при изменении данных в таблице.
+
+Пример ответа:
+
+sql
+
+BEGIN;
+INSERT INTO employees (name, salary) VALUES ('John Doe', 60000);
+UPDATE employees SET salary = 65000 WHERE name = 'Alice Johnson';
+COMMIT;
+
+Использование виртуальных таблиц и полнотекстового поиска:
+
+    Создание виртуальных таблиц для полнотекстового поиска с использованием FTS5.
+
+Пример ответа:
+
+sql
+
+CREATE VIRTUAL TABLE virt_employees
+USING fts5(name TEXT);
