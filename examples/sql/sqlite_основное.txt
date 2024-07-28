@@ -111,3 +111,136 @@ sql
 
 CREATE VIRTUAL TABLE virt_employees
 USING fts5(name TEXT);
+
+Создание индексов:
+        Напишите скрипт, который создает индекс на поле name в таблице employees.
+
+create index idx_name on employees(name)
+
+Создание представлений:
+        Напишите скрипт, который создает представление high_salary_employees, включающее всех сотрудников с зарплатой выше 70000.
+
+create view if not exists high_salary_employees as select * from employees where salary > 70000
+
+
+Использование триггеров:
+        Напишите триггер, который автоматически обновляет поле last_modified в таблице employees при изменении записи.
+
+
+cursor.execute("""alter table employees rename column last to  last_modify""")
+
+cursor.execute("""
+create trigger change_recording after update on employees
+for each row
+begin
+update employees set last_modify = datetime('now') where id = new.id;
+end;
+""")
+
+cursor.execute("""update employees set salary = 65000 where name = 'Дарья'""")
+
+cursor.execute("""drop trigger change_recording""")
+
+
+Чтобы использовать функцию на python в sql запросе нужно зарегистрировать ее
+как пользовательскую функцию:
+
+def length_string(string: str):
+    return len(string)
+
+
+con.create_function("length_string", 1, length_string)
+
+здесь  "length_string" - название функции; 1 - кол-во аргументов; length_string - вызываемая функция
+
+далее можем использвать ее в sql запросе:
+
+empl = cursor.execute("""
+    SELECT * FROM staff WHERE length_string(name) > 8
+    """)
+
+Работа с BLOB:
+    Напишите скрипт, который создает таблицу для хранения изображений сотрудников и добавляет изображение в формате BLOB.
+
+В SQL-запросе INSERT не может быть условия WHERE.
+Для того чтобы связать изображение с сотрудником, нужно сначала вставить изображение в таблицу avatar, а затем обновить запись сотрудника, добавив ссылку на новое изображение.
+
+import sqlite3
+
+# Подключаемся к базе данных
+con = sqlite3.connect('company.db')
+cursor = con.cursor()
+
+# Создаем таблицу avatar, если она еще не существует
+cursor.execute("""
+create table if not exists avatar (
+    id integer primary key autoincrement,
+    image blob
+);
+""")
+
+# Добавляем столбец avatar_id в таблицу staff, если он еще не существует
+cursor.execute("""
+alter table staff add column avatar_id integer;
+""")
+
+# Функция для добавления изображения и связи его с сотрудником
+def add_picture(file: str, name: str):
+    # Читаем файл изображения в бинарном формате
+    with open(file, 'rb') as f1:
+        blob = f1.read()
+    
+    # Вставляем изображение в таблицу avatar
+    cursor.execute("""
+    insert into avatar (image) values (?)
+    """, (blob,))
+    
+    # Получаем id только что вставленного изображения
+    avatar_id = cursor.lastrowid
+    
+    # Обновляем запись сотрудника, добавляя ссылку на изображение
+    cursor.execute("""
+    update staff set avatar_id = ? where name = ?
+    """, (avatar_id, name))
+    
+    # Получаем обновленную информацию о сотруднике
+    res = cursor.execute("""
+    select * from staff join avatar on avatar.id = staff.avatar_id where staff.name = ?
+    """, (name,))
+    
+    return res.fetchall()
+
+# Пример использования функции
+print(add_picture('img/cat.jpg', "Екатерина"))
+
+# Фиксируем изменения и закрываем соединение
+con.commit()
+con.close()
+
+
+Резервное копирование базы данных:
+        Напишите скрипт, который создает резервную копию базы данных company.db.
+
+import shutil
+import datetime
+import os
+
+def backup_database(source_db: str, backup_dir: str):
+    # Получение текущей даты и времени для создания уникального имени файла резервной копии
+    current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_file = f"{backup_dir}/company_backup_{current_time}.db"
+    
+    # Копирование файла базы данных
+    shutil.copy2(source_db, backup_file)
+    print(f"Резервная копия базы данных '{source_db}' создана: '{backup_file}'")
+
+# Пример использования функции
+source_db = "company.db"
+backup_dir = "backup"  # Убедитесь, что эта директория существует или создайте ее заранее
+
+# Создание директории для резервных копий, если она не существует
+if not os.path.exists(backup_dir):
+    os.makedirs(backup_dir)
+
+# Создание резервной копии базы данных
+backup_database(source_db, backup_dir)
