@@ -24,10 +24,79 @@
 
 11. компонент - это функция, которая возращает jsx. Ее нужно не забывать экспортировать
 
-12. Хуки - это функции, которые предоставляет React 
+12. Хуки - это функции, которые предоставляет React. Они не должны объявляться во вложенных компонентах 
 
 13. className - атрибут создающий класс на элементе
 
 14. Стили хранить в отдельной папке styles. Они импортируются в компоненты
 
 15. Для начальной работы можно в папке public оставить только index.html, а в src App.js и index.js
+
+16. props = {} - параметры передаваемые в функцию(компонент)
+
+
+<PostItem post={{ id: 1, title: "JavaScript", body: "Description" }} />
+const PostItem = (props) => {
+  return (
+    <div className="post">
+      <div className="post-content">
+        <strong>
+          {props.post.id} {props.post.title}
+        </strong>
+        <p>{props.post.body}</p>
+      </div>
+      <div className="post-btn">
+        <button>Удалить</button>
+      </div>
+    </div>
+  );
+};
+
+Если аргументов несколько, то можно применить деструктуризацию const PostItem = ({props, info}) => {}
+
+
+17. Также в компонент передаются ключи. Обычно они равны id объекта 
+<PostItem post={title} key={post.id} />
+Ключи позволяют отрисовывать только те элементы, в которых произошли изменения
+
+18. Инлайн стили могут применяться так: <input style={{ marginBottom: 50 }} />
+
+19. В компоненте может быть только один корневой div  return (<div></div>)
+
+20. CSS модули позволяют генерировать уникальное название классов в зависимости от модуля. Если мы хотим создать компоненты со стилями(типо кнопки, инпуты определенного внешнего вида), то в папке components создаем папку UI в ней папку с названием компонента, а в ней jsx и сss файлы('название'.module.css)
+Пример добавления стилей css modules:
+
+import classes from "./MyButton.module.css";
+
+const MyButton = ({ children, ...props }) => {
+  return (
+    <button className={classes.MyBtn} {...props}>
+      {children}
+    </button>
+  );
+};
+
+в App.js: 
+
+<MyButton onClick={addNewPost}>Создать пост</MyButton>
+
+21. React по умолчанию не знает в какое место нужно добавлять вложенные компоненты - для этого нужен children(пример выше)
+
+22. useRef - хук, который позволяет напрямуцю получить доступ к DOM элементу
+пример:
+const bodyInputRef = useRef();
+...
+где то там в коде
+<MyInput type="text" placeholder="Описание поста" ref={bodyInputRef} />
+.....
+
+в файле компонента: 
+
+const MyInput = React.forwardRef((props, ref) => {
+  return <input ref={ref} className={classes.MyInp} {...props} />;
+});
+
+
+23. Перебрать какой-нибудь массив объектов и каждый объект передать в props можно с помощью функции map
+пример:
+{posts.map((post, index) => (<PostItem number={index + 1} post={post} key={post.id} />))}
