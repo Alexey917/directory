@@ -132,17 +132,90 @@ function addNewPost(e) {
    (где то там в return)
    <PostForm create={createPost} />
 
-   27. Функции часто прокидывают на несколько уровней вниз <App /> -> <PodtList /> -> <PostItem />
+27. Функции часто прокидывают на несколько уровней вниз <App /> -> <PodtList /> -> <PostItem />
 
-   28. Условная отрисовка:
-   {условие ? компонент(что угодно) : омпонент(что угодно)}
+28. Условная отрисовка:
+{условие ? компонент(что угодно) : омпонент(что угодно)}
 
-   29. UI компоненты это button'ы, input'ы, select'ы - т.е отдельные теги
-   Просто компоненты - например PostsList - блок содержащий посты
+29. UI компоненты это button'ы, input'ы, select'ы - т.е отдельные теги
+Просто компоненты - например PostsList - блок содержащий посты
 
-   30. Ключи добавляются к перебираемым элементам (массивы select'ов)
+30. Ключи добавляются к перебираемым элементам (массивы select'ов)
 
-   31. Двухстороннее связывание пример:
-        1 - создаем состояние
-        2 - value = {начальное состояние}
-        3 - onChange = {изменение состояния}
+31. Двухстороннее связывание пример:
+  1 - создаем состояние
+  2 - value = {начальное состояние}
+  3 - onChange = {изменение состояния}
+
+32. UseMemo(() => {return реузультат каких то вычислений}, [зависимости])
+Этот хук делает вычисления -> запоминает результат -> кеширует (этот процесс назвается мемоизация), достает массив из кеша
+[зависимости] - если изменяется, то функция снова пересчитывается
+
+пример(поиск и фильтрация): 
+  const sortedAndSearchPosts = useMemo(() => {
+    return sortedPosts.filter(
+      (post) =>
+        post.title.toLowerCase().includes(filter.query.toLowerCase()) ||
+        post.body.toLowerCase().includes(filter.query.toLowerCase())
+    );
+  }, [filter.query, sortedPosts]);
+
+
+33. Сортировка:
+  1 - создаем свой UI компонент например select
+  2- в компоненте используем map для отображения опций, а также передаются пропсы
+
+  const MySelect = ({ options, value, defaultValue, onChange }) => {
+  return (
+    <select value={value} onChange={(event) => onChange(event.target.value)}>
+      <option disabled value="">
+        {defaultValue}
+      </option>
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>
+          {option.name}
+        </option>
+      ))}
+    </select>
+  );
+};
+
+  
+  3 - создается состояние в app.js
+
+  const [filter, setFilter] = useState({ sort: "", query: "" });
+
+  4 - пропсы передаются в компонент myselect и создается функция сортировки(в примере без функции и используется отдельный компонент)
+
+  const PostFilter = ({ filter, setFilter }) => {
+  return (
+    <div style={{ marginBottom: "35px" }}>
+      <MyInput
+        value={filter.query}
+        onChange={(event) =>
+          setFilter({ ...filter, query: event.target.value })
+        }
+        placeholder="Поиск..."
+      />
+      <MySelect
+        value={filter.sort}
+        onChange={(selectedSort) =>
+          setFilter({ ...filter, sort: selectedSort })
+        }
+        defaultValue="Сортировка"
+        options={[
+          { value: "title", name: "По названию" },
+          { value: "body", name: "По описанию" },
+        ]}
+      />
+    </div>
+  );
+};
+
+
+  5 - отсортированные посты добавляются в PostList
+
+  <PostFilter filter={filter} setFilter={setFilter} />
+
+
+
