@@ -218,4 +218,28 @@ function addNewPost(e) {
   <PostFilter filter={filter} setFilter={setFilter} />
 
 
+34. React- router
+  1. Создадим папку pages в которой будем хранить компоненты страниц
+  2. устанавливаем npm i react-router-dom - библиотека для управления роутингом в браузере
+  3. в index.js оборачиваем компонент <App/> в <BrowserRouter></BrowserRouter>
+  4. в App осуществляем роутинг
+  5. используем обертку Routes
+  6. для всех Route можно сделать обертку с <Route></Route> где в props element использовать компонент Layout, в нем будет основная разметка стриницы, типо header, footer, main и.т.п, а весь динамических контент будет отображаться через компонент <Outlet />
+  7. внутри будут <Route path=/путь element={компонент}/>
+  8. <Route path="*" element={компонент}/> - это обработать роут если путь не существует
+  9. по нажатию на ссылки и вообще все переходы не должны провоцировать перезагрузку страницы(главная идея SPA)
+  10. Link - чтобы переходить по ссылкам без перезагрузки, имеют props to он работает как ref в ссылке <a></a>
+  11. <Route index element={компонент}/> - показывает домашнюю страницу
+  12. <Navlink></Navlink> - добавляет css класс active на ссылку. Можно написать свой класс через className={({isActive}) => isActive ? 'наш css класс' : ''}
+
+35. <></> - fragment - вместо div
+
+36. вызов состояния это асинхронный процесс
+
+37. npm install react-transition-group --save - библиотека для плавных переходов в react
+  1. Оборачиваем например посты отображаемые через map в компонент <CSSTransition></CSSTransition>
+  2. почитать как применять на странице  https://reactcommunity.org/react-transition-group/
+
+
+
 
