@@ -299,3 +299,28 @@ src: url('путь') format("woff"),
   filter: opacity(50%); /* аналогичен свойству opacity */
   filter: blur(30%) brightness(150%); /* так можно комбинировать фильтры */
 }
+
+/* Трансформации */
+
+.block7 {
+  transform: rotate(351deg); /* поворот элемента */
+  transform: scale(0.2, 0.7); /* масштабирование по x и y (от 0 до 1 - уменьшение, больше 1 - увеличение) */
+  transform: scaleY(1.2); /* масштабирование по y */
+  transform: scaleX(0.5); /* масштабирование по x */
+  transform: translate(50%, 50%); /*перемещение по x и y */
+  transform: translateX(-78px); /* перемещение по оси x */
+  transform: translateY(40px); /* перемещение по оси y */
+  transform: skew(21deg, 21deg); /* наклон по x и y */
+  transform: skewX(45deg); /* наклон по x */
+  transform: skewY(360deg); /* наклон по y */
+  transform: rotate(15deg) translate(35px, 60px) skewX(10deg); /* можно применить несколько трансформаций сразу */
+  transform-origin: right bottom; /* задать опорную точку для трансформации по x и y (можно пиксели или %) */
+}
+
+/* Плавные переходы */
+
+.block8 {
+  transition-duration: 4s, 500ms; /* длительность перехода */
+  transition-property: background-color, scale; /* свойство(а) к которому(ым) будет применен transition, если хотим указать все свойства используем значение all */
+  transition-delay: 0, 1s; /* задержка времени перед применением transition */
+}
