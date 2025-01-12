@@ -323,4 +323,94 @@ src: url('путь') format("woff"),
   transition-duration: 4s, 500ms; /* длительность перехода */
   transition-property: background-color, scale; /* свойство(а) к которому(ым) будет применен transition, если хотим указать все свойства используем значение all */
   transition-delay: 0, 1s; /* задержка времени перед применением transition */
+
+  transition-timing-function: easy; /* скорость перехода easy - сначало медленно, потом ускоряется, потом медленно */
+  transition-timing-function: easy-in; /* в начале медленно в конце быстро */
+  transition-timing-function: easy-out; /* начало быстрое конец медленный */
+  transition-timing-function: easy-in-out; /* начало и конец медленные */
+  transition-timing-function: linear; /* скорость одинаковая */
+  transition-timing-function: step-start; /* моментальный переход */
+  transition-timing-function: step-end; /* по истечению указанного времени происходит моментальный переход */
+  transition-timing-function: steps(10, start); /* постепенный переход в 10 шагов в начале первого шага */
+  transition-timing-function: steps(10, end); /* постепенный переход в 10 шагов в конце первого шага */
+  transition-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1); /* переход на основании кривых бизье(чем круче линия, тем быстрее переход) */
+  transition: all 1s easy .5s; /* property, duration, timing-function, delay */
 }
+
+/* Анимации */
+
+@keyframes название-анимации {
+  from {
+  background-color: blue;
+  }
+
+  50% {
+    background-color: black;
+  }
+
+
+  to {
+    background-color: red;
+  }
+}
+
+.block9 {
+  /* анимации отличаются от переходов тем, что у может бытьних более двух состояний(начало и конец - одно свойство и другое) */
+  animation: название-анимации;
+  animation-duration: 5s; /* длительность анимации */
+  animation-timing-function: linear; /* такие же значение как и у transition */
+  animation-iteration-count: infinite; /* сколько раз повторится анимация (можно числом указать количество, а infinite - бесконечно) */
+  animation-delay: 13s; /* задержка времени перед применением анимации */
+
+  animation-direction: alternate; /* каждый нечетный повтор идет в нормальном направлении, четный в обратном */
+  animation-direction: reverse; /* все повторы в обратном направлении */
+  animation-direction: alternate-reverse; /* каждый нечетный повтор идет в обратном направлении, четный в нормальном */
+  animation-direction: normal; /* все повторы в нормальном направлении (дефолтное значение) */
+
+  animation-play-state: paused; /* останавливает анимацию (значение running - запускает) */
+  animation-fill-mode: forwards; /* позволяет остановить анимацию в конце и не возвращать объект в начальное положение */
+
+  animation: name duration timing-function delay iteration-count direction fill-mode;
+
+  /* на элементе можно применить нескколько анимаций */
+  animation: name duration timing-function delay iteration-count direction fill-mode, name2 duration timing-function;
+}
+
+/* таблицы и курсор */
+
+.block10 {
+  border-collapse: collapse; /* оставляет одну границу на смежный участках таблицы (separate - дефолтное значение) */
+  border-spacing: 10px 20px; /* расстояние между границами по гризонтали и вертикали соответственно */
+  caption-side: top; /* устанавливает положение caption сверху таблицы (bottom - снизу) */
+  /* контент внутри таблицы можно выравнивать с помощью tex-align и vertical-align */
+  empty-cells: hide; /* пустые ячейки лишаются границ и фона (show - дефолтное значение) */
+
+  pointer-events: none; /* курсор больше не может взаимодействовать с этим элементом (может быть ползеным при disabled кнопках) */
+  cursor: pointer; /* изменить внешний вид указателя */
+}
+
+/* текстовые эффекты и многоколоночный текст */
+
+.block11 {
+  text-overflow: ellipsis; /* обрежет текст, который не помещается в контейнер, поставит многоточие в конце (clip - по умолчанию) */
+  white-space: nowrap; /* текст станет однострочным и не будет переноситься на новую строку */
+  word-wrap: break-word; /* позволяет разбить слово и перенести его часть на другю строку, если слово не помещается */
+  writing-mode: sideways-lr; /* сделает текст повертикали с левого края */
+  word-break: break-all; /* все слова в конце строки разбиваются посимвольно оставляя свобоное место */
+
+  column-count: 3; /* разбивает блок на 3 колонки */
+  column-rule: 1px solid red; /* устанавливает разграничительную линию между колонками */
+  column-width: 3; /* задает ширину колонки */
+  column-gap: 3; /* задает расстояние между колонками */
+}
+
+/* медиа запросы */
+
+@media screen {
+  /* screen - для устройств с дисплеями, all - для всех устройств, speech - для скринридеров, print - для принтеров */
+  body {
+    background-color: #fff;
+  }
+}
+
+
