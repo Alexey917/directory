@@ -407,10 +407,51 @@ src: url('путь') format("woff"),
 /* медиа запросы */
 
 @media screen {
-  /* screen - для устройств с дисплеями, all - для всех устройств, speech - для скринридеров, print - для принтеров */
+  /* screen - для устройств с дисплеями, all - для всех устройств, speech - для скринридеров, print - для принтеров и предварительного просмотра */
   body {
     background-color: #fff;
   }
 }
 
+@media screen, print {
+  /*  через запятую укажем условия (нужно чтобы хотя бы одно выполнилось), and - оба условия, not - отрицание условия */
+}
+
+@media screen and (min-width: 992px) and (max-width: 1200px) {
+  /* есть 6 параметров экрана, которые можно задать (width?, height, min-height, max-height, min-width, max-width) */
+}
+
+@media screen and (orientaiton: portrait) {
+  /* portrait - высота больше ширины, landscape - ширина больше высоты */
+}
+
+/* placeholder, scroll, css спрайты */
+.blocklast {
+  ::placeholder {
+    /*хром, сафари, мозила*/
+    color: red;
+  }
+
+  ::-ms-input-placeholder {
+    /*edge*/
+    color: red;
+  }
+
+  :-ms-input-placeholder {
+    /*интеренет экспловер 10-11*/
+    color: red;
+  }
+
+  ::-webkit-scrollbar {
+    /* стилизация места под скролл */
+  }
+
+  ::-webkit-scrollbar-track {
+    /* стилизация подложки скролла */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    /* стилизация ползунка скролла */
+  }
+}
 
