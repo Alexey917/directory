@@ -250,6 +250,8 @@ function addNewPost(e) {
   15. Хук useNavigate() - позволяет двигаться по истории переходов. Он возвращает функцию. - Если мы передадим туда число, это это будет переход по истории на n вперед (число положительное) или назад (отрицательное)
   const navigate = useNavigate()
   const goBack = () => navigate(-1) - назад на один шаг по истории 
+  const goPostIdPage = () => navigate(`posts/${props.post.id}`);
+
   - Если мы передаем ссылку, то можем устанавить параметры replace и state
   replace: false - (по умолчанию) редирект на адрес, который запишется в историю
   replace: true - редирект на адрес без записи в историю
@@ -258,6 +260,33 @@ function addNewPost(e) {
   - Компонент Navigate - позволяет делать переадресацию(например если адрес страницы изменился на другой)
   <Route path="about-us" element={<Navigate  to="about" replace/>} /> replace - не сохранит переход в историю
   - useLocation() - применяется при приватных маршрутах(например при авторизации). Возвращает объект, одни из ключей такого объекта это pathname и state
+     Например создадим авторизацию:
+      + создадим папку hoc
+      + создадим компонент RequireAuth
+      + внутри:
+      const RequireAuth = ({children}) => {
+        const location = useLocation();
+        const auth = false;
+
+        if (!auth) {
+          return <Navigate to='/login' state={{from: location}} />
+        }
+
+        return children
+      }
+
+  
+
+  Все роуты можно вынести в отдельную папку routes, в ней создать route.js, а внутри создать массив:
+
+  export const routes = [
+  { path: 'about', component: <About /> },
+  { path: ':id', component: <PostIdPage /> },
+  { path: '*', component: <Notfound /> },
+]
+
+далее в apps.js с помощью map выводим все роуты(естественно роут с главной странице и компонентом <Layout/> мы не помещаем в массив, они остаются в apps.js на месте)
+
 
 35. <></> - fragment - вместо div
 
