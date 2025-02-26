@@ -288,6 +288,59 @@ function addNewPost(e) {
 далее в apps.js с помощью map выводим все роуты(естественно роут с главной странице и компонентом <Layout/> мы не помещаем в массив, они остаются в apps.js на месте)
 
 
+
+
+useContext() - создает гобальное хранилище и позволяет передать данные в приложение и получить внутри любого компонента доступ к этим данным напрямую, минуя пропсы
+
+-Создаем контекст на глобальном уровне
+const UserContext = React.createContext({});
+
+-оборачиваем то место, где будет применяться контекст
+// user — данные которые лежат внутри контекста
+<UserContext.Provider value={user}>
+  <MyComponent />
+</UserContext.Provider>
+
+-применение контекста внутри компонента
+import React, { useContext } from 'react';
+
+const MyComponent = () => {
+  // Возвращает контекст целиком
+  const user = useContext(UserContext);
+
+  return <h1>{user.name}</h1>;
+}
+
+
+
+Бесконечная лента - чтобы ее реализовать можно взять какой то элемент на страницы и отслеживать его, и когда он будет в зоне видимости подгружать новую порцию данных(или страницу)
+
+Например элемент для наблюдения:
+<div
+  ref={lastElement}
+  style={{ height: 20, backgroundColor: "red" }}
+></div>
+
+отдельно создадим кастомный хук для наблюдения за элементом:
+
+import { useEffect, useRef } from 'react';
+
+export const useObserver = (ref, canLoad, isLoading, callback) => {
+  const observer = useRef();
+
+  useEffect(() => {
+      let cb = function (entries, observer) {
+        if (isLoading) return;  // если посты загружаются, то мы ничего не делаем
+        if (observer.current) observer.current.disconnect(); // если элемнт уже наблюдается, то отключчаем все наблюдения
+        if (entries[0].isIntersecting && canLoad) callback(); // проверка в зоне видимости элемент или нет
+      };
+  
+      observer.current = new IntersectionObserver(cb); // создаем наблюдателя
+      observer.current.observe(ref.current); // устанавливаем за каким элементом наблюдаем
+    }, [isLoading]);
+}
+
+
 35. <></> - fragment - вместо div
 
 36. вызов состояния это асинхронный процесс. React накапливает какое количество изменений в целям оптимизации, если есть несколько функций, которые изменяют состояние. Нужно это чтобы избежать повторных манипуляций с DOM
