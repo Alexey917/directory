@@ -275,7 +275,205 @@ function addNewPost(e) {
         return children
       }
 
+---- useSearchPararms - предназначен для чтения и изменения строки запроса в URL для текущего маршрута. По аналогии с хуком useState возвращает значение и функцию для изменения этого значения. Значение — это объект URLSearchParams, у которого множество методов для работы с GET-параметрами (get, set, getAll, has, append, delete, …)
+
+например мы можем через get запрос фильтровать посты:
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const postQuery = searchParams.get("post") || "";
+  const latest = searchParams.has("latest");
+
+  const startFrom = latest ? 80 : 1;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const query = form.search.value;
+    const isLatest = form.latest.checked;
+
+    const params = {};
+
+    if (query.length) params.post = query;
+    if (isLatest) params.latest = true;
+
+    setSearchParams(params);
+  };
+
+  в jsx:
+  <form onSubmit={handleSubmit}>
+    <input type="search" name="search" />
+    <label>
+      <input type="checkbox" name="latest" />
+        new
+    </label>
+    <input type="submit" />
+  </form>
+
+  и остается отфильтровать посты, например через метод filter, где проверяем содержит ли заголовок postQuery
+
+
+---Вложенные роуты:
+<Route path="about" element={<About />}>
+  <Route path="contacts" element={<Contacts />}></Route>      
+  <Route path="team" element={<Team />}></Route>  
+</Route>
+1. Вложенные роуты иcпользуют относительные ссылки т.е "contacts/что то там", "team" - а не "about/contacts/что то там", "about/team"
+2. В компоненте Link, тоже будут использоваться относительные пути
+3. Вложенные роуты  перерисовывают какую то часть контента, эта часть обозначается через компонент Outlet(в данном случае его нужно указать внутри jsx компонента About)
+
+
+---Новые возможности react router 6.4
+
+const router = createBrowserRouter(createRoutesFromElements(
+  <Route path="about" element={<About />}>
+    <Route path="contacts" element={<Contacts />}></Route>      
+    <Route path="team" element={<Team />}></Route>  
+  </Route>
+  .....
+  и другие наши роуты(при этом компонент <Routes></Routes> не используется)
+))
+
+в index.js больше не используется компонент <BrowserRouter></BrowserRouter>
+
+в jsx App.js помещаем компонент <RouterProvider router={router} />
+
+1. Внутри компонента (любого) создаем асинхронную функцию (loader), которая возвращает какие то данные, и в роутах передаем ее как свойство. Эти данные находятся в RouterProvider и дастать их оттуда можно с помощью хука useLoaderData()
+
+const posts = useLoaderData();
+
+async function getPosts() {
+  const res = await fetch('url');
+  return res.json()
+}
+
+const blogLoader = async ({request, params}) => {
+  return defer({
+    posts: getPosts()  // defer - функция помощник, которая позволяет благодаря Suspense показать предзагрузку, благодаря Await отобразить данные когда мы их получим
+  })
+}
+
+также в этоми же компоненте добавляем компоненты
+
+<Suspense fallback={<h2>Тут может быть логика отображения загрузки(спинер, скелетон)</h2>}>
+  <Await resolve={posts}>
+      {
+        (полученные данные) => (<>
+          //тут в формате jsx рендерим полученные данные
+        </>)
+      }
+  </Await>
+</Suspense>
+
+<Route path="something" element={SomeComponent} loader={blogLoader}/>
+
+Это можно использовать, например, вместо useState и useEefect для получения постов с сервера
+
+Если нам нужно получить какой то параметр из адресной строки, то вместо useParams внутри асинхронного лоудера мы обратимся к обекту params
+
+const {post, id} = useLoaderData();
+
+const blogLoader = async ({request, params}) => {
+  const id = params.id
+
+  const res = await fetch('url/${id}');
+  const post = await res.json()
+  return {post, id}
+}
+
+
+//////////////////////////////////////////////////////////////////////
+
+  Авторизация:
+  1. Создаем компонент со страницей авторизации
+    export const Login = () => {
+      const navigate = useNavigate();
+      const location = useLocation();
+      const { logIn } = useAuth();
+
+      let fromPage = location.state?.pathname || "/";
+      console.log(fromPage);
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const user = form.username.value;
+
+        logIn(user, () => navigate(fromPage, { replace: true }));
+      };
+
+      return (
+        <>
+          <h1>Страница входа</h1>
+          <form onSubmit={handleSubmit}>
+            <MyInput type="text" placeholder="Введите имя" name="username" />
+            <MyInput type="password" placeholder="Введите пароль" />
+            <MyButton type="submit">Войти</MyButton>
+          </form>
+        </>
+      );
+    };
+
+  2. Создаем папку hoc для компонентов высшего порядка и сам компонент. Он будет делать проверку авторизован пользователь или нет
   
+  export const RequireAuth = ({ children }) => {
+    const location = useLocation();
+    let { user } = useAuth();  // из кастомного хука приняли контекст
+
+    if (!user) return <Navigate to="login" state={{ from: location }} />;
+
+    return children;
+  };
+
+  3. В компоненте со всеми роутами мы оборачиваем в <RequireAuth></RequireAuth> те компоненты, которые требуют авторизации
+  4. Содаем еще один компонент высшего порядка, во внутрь которого будем помещать все роуты которые нужно будет обеспечить определенной информацией(об авторизации), которая храниться в value={value}
+
+  export const AuthContext = createContext(null);
+
+  export const AuthProvider = ({children}) => {
+    const [user, setUser] = useState(null)
+
+    const logIn = (newUser, callback)  => {
+      setUser(newUser) // устанавливает пользователя
+      callback()  // переадресация после установки
+    }
+
+    const logOut = (callback)  => {
+      setUser(null) // убирает пользователя
+      callback()  // переадресация после уборки
+    }
+
+    const value = { user, logIn, logOut };
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  }
+
+  5. В компоненте со всеми роутами мы оборачиваем в <AuthProvider></AuthProvider> все роуты
+
+  6. Создаем кастомный хук, в котором принимаем контекст, чтобы не писать это каждый раз внутри каждого компонента
+
+  export const useAuth = () => {
+    return useContext(AuthContext);
+  }
+
+  7. Чтобы создать разлогин создаем кнопку в компоненте где можно будет выйти, добавляем туда контекст и прописываем логику выходв
+
+    const About = () => {
+    const { logOut } = useAuth();
+    const navigate = useNavigate();
+
+    return (
+      <>
+        <h1>Информация о сайте</h1>
+        <MyButton
+          onClick={() => logOut(() => navigate("login"), { replace: true })}
+        >
+          Выйти
+        </MyButton>
+      </>
+    );
+  };
+  /////////////////////////////////////////////////////////////////////
 
   Все роуты можно вынести в отдельную папку routes, в ней создать route.js, а внутри создать массив:
 
