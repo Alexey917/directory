@@ -338,7 +338,7 @@ const router = createBrowserRouter(createRoutesFromElements(
 
 в jsx App.js помещаем компонент <RouterProvider router={router} />
 
-1. Внутри компонента (любого) создаем асинхронную функцию (loader), которая возвращает какие то данные, и в роутах передаем ее как свойство. Эти данные находятся в RouterProvider и дастать их оттуда можно с помощью хука useLoaderData()
+1. Внутри компонента (любого) создаем асинхронную функцию (loader), которая возвращает какие то данные, и в роутах передаем ее как свойство. Эти данные находятся в RouterProvider и достать их оттуда можно с помощью хука useLoaderData()
 
 const posts = useLoaderData();
 
@@ -380,6 +380,133 @@ const blogLoader = async ({request, params}) => {
   const post = await res.json()
   return {post, id}
 }
+
+второй вариант(без defer) - создать компонент в этом же файле и внутри него вызвать useAsyncValue
+
+const Post = () => {
+  const post = useAsyncValue()
+
+  return (
+    <>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </>
+  )
+
+}
+
+ниже в jsx этого компонента:
+
+<Suspense fallback={<h2>Тут может быть логика отображения загрузки(спинер, скелетон)</h2>}>
+  <Await resolve={posts}>
+      <Post />
+  </Await>
+</Suspense>
+
+2. Обработка ошибок через проп errorElement, в который нужно передать компонент отвечающий за отрисовку ошибок
+
+<Route path="something" element={SomeComponent} errorElement={<SomeErrorComponent/>}/> 
+
+сам компонент отвечающий за отрисовку ошибок:
+
+const SomeErrorComponent = () => {
+  const error = useRouterError() // получаем ошибку из асинхронной функции, которую пробросили
+
+  return (
+    <div>
+      <h1>{error.status}</h1>
+      <p>{error.statusText || 'Something goes wrong!'}</p>
+    </div>
+  )
+}
+
+ошибку отлавливаем в компоненте, в асинхронной функции:
+
+async function getPosts() {
+  const res = await fetch('url');
+
+  if (!res.ok) throw new Response("", {status: res.status, statusText: "Not found"})
+  return res.json()
+}
+
+вариант второй, если мы пробрасываем ошибку не в асинхронной функции, а loader
+
+const blogLoader = async () => {
+  const posts = getPosts();
+  // json - метод react-router-dom принимает два параметра
+  if(!posts.length) {
+    throw json({message: "Not found", reason: "wrong url"}, {status: 404})
+  }
+
+  return { posts }
+}
+
+таким образом в SomeErrorComponent у error появляется свойство data, которое хранит 1 параметр метода json
+
+const SomeErrorComponent = () => {
+  const error = useRouterError() // получаем ошибку из асинхронной функции, которую пробросили
+
+  if(isRouterErrorResponse(error)) {
+    return (
+      <div>
+        <h1>{error.status}</h1>
+        <p>{error.data.message }</p>
+        <p>{error.data.reason}</p>
+      </div>
+    )
+  }
+
+  throw error // прокидываем ошибку дальше, или отрисовываем альтертивный jsx (return <div>'Something goes wrong!</div>)
+  
+}
+
+У нас также есть хелпер isRouterErrorResponse, который проверяет а ошибка на стороне роутинга?
+
+Также errorElememt можно поместить на родительский компонент, если ошибка есть, то errorElememt всплывет и его компонент отрисуется вместо родительского(ну или вместо того роута, в котором этот проп находится)
+
+
+3. Отправка данных с формы:
+
+Создаем компонент, в котром будет форма (её нам предоставляет react-router-dom)
+
+const NewPost = () => {
+  return (
+    <Form action="url, который использует роут, на который дальше мы добавим проп action" method="post">
+      <label>
+        Title:
+        <input type="text" name="title" />
+      </label>
+      <label>
+        Body:
+        <input type="text" name="body" />
+      </label>
+      <input type="hidden" name="userId" value="1" />
+      <input type="submit" value="Add new post" />
+    </Form>
+  )
+}
+
+Далее Добавляем этот компонент в компонент на котором будет action()
+
+<Route path="something" element={<CreatePost />} action={Название фсихронной функции, лежащей внутри CreatePost}/> 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 //////////////////////////////////////////////////////////////////////
@@ -749,4 +876,42 @@ function search(query) {
 
 <input type="text" value={value} onChange={onChange} />
 
-5) 
+5) Запрос на сервер и получение результата
+
+import { useEffect, useState } from "react"
+
+export const useRequest = (request) => {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    setLoading(true)
+    setTimeout(() => {
+      request().then(response => setData(response.data)).catch(err => setError(err)).finally(setLoading(false))
+    }, 2000)
+    
+  }, [])
+
+  return [data, loading, error]
+}
+
+в месте применения:
+
+import axios from "axios";
+const [data, loading, error] = useRequest(fetchData);
+
+function fetchData() {
+  return axios.get("https://jsonplaceholder.typicode.com/todos");
+}
+
+в jsx:
+
+{data &&
+  data.map((d) => (
+    <div key={d.id} style={{ padding: 30, border: "1px solid black" }}>
+      <p>
+        {d.id}. {d.title}
+      </p>
+     </div>
+))}
